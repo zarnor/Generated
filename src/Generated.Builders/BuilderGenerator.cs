@@ -130,7 +130,7 @@ internal class BuilderGenerator
                         var member = assignableMembers[i];
                         var isLast = i == assignableMembers.Length - 1;
 
-                        indentWriter.WriteLine($"{member.Name} = {member.ValueMemberName}{(isLast ? "" : ",")}");
+                        indentWriter.WriteLine($"{member.Name} = {member.ValueMemberName}{(member.IsArray ? ".ToArray()" : "")}{(isLast ? "" : ",")}");
                     }
                     indentWriter.EndScope(";");
                 }
@@ -172,6 +172,12 @@ internal class BuilderGenerator
         if (hasCollections)
         {
             namespaces = namespaces.Concat(new[] { "System.Collections.Generic" });
+        }
+
+        var hasArrays = InitMembers.Any(im => im.IsArray);
+        if (hasArrays)
+        {
+            namespaces = namespaces.Concat(new[] { "System.Linq" });
         }
 
         return namespaces

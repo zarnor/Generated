@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.Text;
@@ -305,6 +304,88 @@ namespace TestProject.Models
                 ret.Names.Add(element);
             }
             return ret;
+        }
+    }
+}
+";
+
+        await new VerifyCS.Test
+        {
+            TestState =
+            {
+                Sources = { code },
+                GeneratedSources =
+                {
+                    (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
+                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                },
+            },
+        }.RunAsync();
+    }
+
+
+    [Fact]
+    public async Task Builds_Arrays()
+    {
+        var code = @"using System;
+using System.Collections.Generic;
+using Generated.Builders;
+
+namespace TestProject.Models;
+
+public class Customer
+{
+    public string[] Names { get; set; }
+}
+
+[FlexibleBuilder(typeof(Customer))]
+public partial class CustomerBuilder
+{
+}
+";
+        var expected = @"using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace TestProject.Models
+{
+    public partial class CustomerBuilder
+    {
+        private List<string> _names;
+
+        private CustomerBuilder()
+        {
+        }
+
+        public static CustomerBuilder Init()
+        {
+            return new CustomerBuilder();
+        }
+
+        public CustomerBuilder WithNames(IEnumerable<string> values)
+        {
+            _names = new List<string>(values);
+            return this;
+        }
+
+        public CustomerBuilder AddName(string value)
+        {
+            if (_names == null)
+            {
+                _names = new List<string>();
+            }
+
+            _names.Add(value);
+
+            return this;
+        }
+
+        public Customer Build()
+        {
+            return new Customer()
+            {
+                Names = _names.ToArray()
+            };
         }
     }
 }

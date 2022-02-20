@@ -60,6 +60,12 @@ internal static class ITypeSymbolExtensions
                 }
             }
         }
+        else if (symbol is IArrayTypeSymbol arrayTypeSymbol)
+        {
+            elementNamespace = arrayTypeSymbol.ElementType.ContainingNamespace.Name;
+            elementName = arrayTypeSymbol.ElementType.ToSimplifiedString();
+            return true;
+        }
 
         elementNamespace = null;
         elementName = null;

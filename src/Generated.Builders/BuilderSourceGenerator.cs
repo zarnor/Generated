@@ -62,6 +62,7 @@ internal class BuilderSourceGenerator : ISourceGenerator
                         TypeNamespace = elementNamespace,
                         TypeName = elementName,
                         IsCollection = true,
+                        IsArray = member.Type.Kind == SymbolKind.ArrayType,
                         HasSetter = !member.IsReadOnly
                     });
                 }
