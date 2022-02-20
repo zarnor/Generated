@@ -1,4 +1,3 @@
-using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -48,12 +47,33 @@ internal class BuilderSourceGenerator : ISourceGenerator
 
             foreach (var member in implementedType.GetMembers().OfType<IPropertySymbol>())
             {
-                builder.InitMembers.Add(new InitMember()
+                bool isCollection = member.Type.IsCollection(out string elementNamespace, out string elementName);
+
+                if (member.IsReadOnly && !isCollection)
                 {
-                    Name = member.Name,
-                    TypeNamespace = member.Type.ContainingNamespace.Name,
-                    TypeName = member.Type.ToSimplifiedString()
-                });
+                    continue;
+                }
+
+                if (isCollection)
+                {
+                    builder.InitMembers.Add(new InitMember()
+                    {
+                        Name = member.Name,
+                        TypeNamespace = elementNamespace,
+                        TypeName = elementName,
+                        IsCollection = true,
+                        HasSetter = !member.IsReadOnly
+                    });
+                }
+                else
+                {
+                    builder.InitMembers.Add(new InitMember()
+                    {
+                        Name = member.Name,
+                        TypeNamespace = member.Type.ContainingNamespace.Name,
+                        TypeName = member.Type.ToSimplifiedString(),
+                    });
+                }
             }
 
             var source = builder.Build();

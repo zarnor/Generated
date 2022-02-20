@@ -5,6 +5,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Generated.Builders;
 
+/// <summary>
+/// Receives the syntax nodes and determines which classes have been marked to augment.
+/// </summary>
 internal class BuilderSyntaxReceiver : ISyntaxContextReceiver
 {
     public List<TypeDeclarationSyntax> ClassesToAugment { get; } = new List<TypeDeclarationSyntax>();
