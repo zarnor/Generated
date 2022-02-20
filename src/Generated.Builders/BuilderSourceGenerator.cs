@@ -45,12 +45,41 @@ internal class BuilderSourceGenerator : ISourceGenerator
                 IsPublic = true
             };
 
+            if (implementedType.Constructors.Length == 1)
+            {
+                // TODO: Diagnostic error when multiple constructors
+                var constructorParameters = implementedType.Constructors.Single().Parameters;
+                int index = 0;
+                foreach (var ctorParam in constructorParameters)
+                {
+                    bool isCollection = ctorParam.Type.IsCollection(out string elementNamespace, out string elementName);
+
+                    builder.InitMembers.Add(new InitMember()
+                    {
+                        Name = ctorParam.Name.Capitalize(),
+                        TypeNamespace = elementNamespace ?? ctorParam.Type.ContainingNamespace.Name,
+                        TypeName = elementName ?? ctorParam.Type.ToSimplifiedString(),
+                        IsCollection = isCollection,
+                        IsArray = ctorParam.Type.Kind == SymbolKind.ArrayType,
+                        HasSetter = false,
+                        CtorIndex = index++
+                    });
+                }
+            }
+
             foreach (var member in implementedType.GetMembers().OfType<IPropertySymbol>())
             {
                 bool isCollection = member.Type.IsCollection(out string elementNamespace, out string elementName);
 
                 if (member.IsReadOnly && !isCollection)
                 {
+                    // Skip readonly properties if they're not collections
+                    continue;
+                }
+
+                if (builder.InitMembers.Any(im => im.Name == member.Name))
+                {
+                    // Skip properties that have already been added (as constructor parameters)
                     continue;
                 }
 

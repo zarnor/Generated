@@ -113,13 +113,44 @@ internal class BuilderGenerator
             indentWriter.WriteLine($"public {TargetClassName} Build()");
             indentWriter.BeginScope();
 
-            var membersNeedingAdding = InitMembers.Where(m => m.IsCollection && !m.HasSetter).ToArray();
-            var assignableMembers = InitMembers.Where(m => !m.IsCollection || m.HasSetter).ToArray();
+            var constructorMembers = InitMembers.Where(m => m.CtorIndex.HasValue).ToArray();
+            var membersNeedingAdding = InitMembers.Where(m => m.CtorIndex == null && m.IsCollection && !m.HasSetter).ToArray();
+            var assignableMembers = InitMembers.Where(m => m.CtorIndex == null && (!m.IsCollection || m.HasSetter)).ToArray();
 
             if (InitMembers.Count > 0)
             {
                 bool needsVariable = membersNeedingAdding.Length > 0;
-                indentWriter.WriteLine($"{(needsVariable ? "var ret =" : "return")} new {TargetClassName}(){(assignableMembers.Length > 0 ? "" : ";" )}");
+
+                if (needsVariable)
+                {
+                    indentWriter.Write("var ret = ");
+                }
+                else
+                {
+                    indentWriter.Write("return ");
+                }
+
+                indentWriter.Write($"new {TargetClassName}(");
+
+                for (int i = 0; i < constructorMembers.Length; i++)
+                {
+                    var member = constructorMembers[i];
+                    var isLast = i == constructorMembers.Length - 1;
+
+                    // TODO: Should convert to list/set/dictionary here or expect constructo to always accept IEnumerable?
+                    indentWriter.Write($"{member.ValueMemberName}{(member.IsArray ? ".ToArray()" : "")}{(isLast ? "" : ",")}");
+                }
+
+                indentWriter.Write(")");
+
+                if (assignableMembers.Length == 0)
+                {
+                    indentWriter.WriteLine(";");
+                }
+                else
+                {
+                    indentWriter.WriteLine();
+                }
 
                 // Members that can be assigned with init accessors
                 if (assignableMembers.Length > 0)
@@ -135,7 +166,7 @@ internal class BuilderGenerator
                     indentWriter.EndScope(";");
                 }
 
-                // Members that 
+                // Collection members that need adding
                 if (membersNeedingAdding.Length > 0)
                 {
                     for (int i = 0; i < membersNeedingAdding.Length; i++)
