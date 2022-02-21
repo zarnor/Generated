@@ -1,7 +1,15 @@
+# Generated
 
 ## Generated.Builders
 
 Creates builders for simple classes.
+
+### Features
+
+- Adds a WithProperty() funtion for each settable property and constructor argument.
+- Injects constructor arguments on Build()
+- Sets class properties (set or init) on Build()
+- Collections can be fully replaced (.WithCollection()) or added one by one (.AddToCollection())
 
 ```c#
 using System;
@@ -17,7 +25,7 @@ public class Customer
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public List<string> Titles { get; set; }
-    public List<Address> Titles { get; set; }
+    public List<Address> Addresses { get; set; }
 }
 
 [FlexibleBuilder(typeof(Customer))]
@@ -35,7 +43,7 @@ var customer = CustomerBuilder.Init()
     .WithFirstName("Test")
     .WithLastName("User")
     .WithTitles(new [] { "Dr", "Sgt" }) // Replace whole collection
-    .AddAddress( // Add one item to collection
+    .AddToAddresses( // Add one item to collection
         AddressBuilder.Init()
         .WithStreetAddress("221B Baker Street")
         .WithCity("London")

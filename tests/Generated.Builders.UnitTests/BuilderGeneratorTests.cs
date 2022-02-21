@@ -286,7 +286,7 @@ namespace TestProject.Models
             return this;
         }
 
-        public CustomerBuilder AddName(string value)
+        public CustomerBuilder AddToNames(string value)
         {
             if (_names == null)
             {
@@ -366,7 +366,7 @@ namespace TestProject.Models
             return this;
         }
 
-        public CustomerBuilder AddName(string value)
+        public CustomerBuilder AddToNames(string value)
         {
             if (_names == null)
             {
@@ -608,7 +608,7 @@ namespace TestProject.Models
             return this;
         }
 
-        public CustomerBuilder AddName(string value)
+        public CustomerBuilder AddToNames(string value)
         {
             if (_names == null)
             {

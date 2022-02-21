@@ -85,7 +85,7 @@ internal class BuilderGenerator
                     indentWriter.EndScope();
 
                     indentWriter.WriteEmptyLine();
-                    indentWriter.WriteLine($"public {ClassName} Add{member.Name.ToSingular()}({member.TypeName} value)");
+                    indentWriter.WriteLine($"public {ClassName} AddTo{member.Name}({member.TypeName} value)");
                     indentWriter.BeginScope();
                     indentWriter.WriteLine($"if ({member.ValueMemberName} == null)");
                     indentWriter.BeginScope();
