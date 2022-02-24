@@ -1,3 +1,5 @@
+using Microsoft.CodeAnalysis;
+
 namespace Generated.Builders;
 
 internal class InitMember
@@ -9,6 +11,7 @@ internal class InitMember
     public bool HasSetter { get; set; }
     public bool IsArray { get; set; }
     public int? CtorIndex { get; set; }
+    public INamedTypeSymbol CollectionType { get; internal set; }
 
     internal string ValueMemberName => "_" + Name.Substring(0, 1).ToLower() + Name.Substring(1);
 }

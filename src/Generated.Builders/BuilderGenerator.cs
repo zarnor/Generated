@@ -1,4 +1,3 @@
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +11,7 @@ internal class BuilderGenerator
     public string TargetClassName { get; internal set; }
     public bool IsPublic { get; internal set; }
     public string NewLine { get; internal set; }
-    public IList<InitMember> InitMembers { get; } = new List<InitMember>();
+    public List<InitMember> InitMembers { get; } = new List<InitMember>();
 
     public string Build()
     {
@@ -20,177 +19,109 @@ internal class BuilderGenerator
 
         var importedNamespaces = GetImportedNamespaces();
 
-        using (var writer = new StringWriter() { NewLine = NewLine })
-        using (var indentWriter = new IndentedTextWriter(writer) { NewLine = NewLine })
+        using (var stringWriter = new StringWriter() { NewLine = NewLine })
+        using (var writer = new CodeIndentedTextWriter(stringWriter) { NewLine = NewLine })
         {
             // Usings
-            if (importedNamespaces.Length > 0)
+            writer.Usings(importedNamespaces);
+
+            // Namespace & Class declaration
+            using (writer.Namespace(Namespace))
+            using (writer.Class(ClassName, IsPublic))
             {
-                foreach (var ns in importedNamespaces)
-                {
-                    indentWriter.WriteLine($"using {ns};");
-                }
-
-                indentWriter.WriteEmptyLine();
-            }
-
-            // Namespace
-            indentWriter.WriteLine($"namespace {Namespace}");
-            indentWriter.BeginScope();
-
-            // Class declaration
-            indentWriter.WriteLine($"{(IsPublic ? "public" : "internal")} partial class {ClassName}");
-            indentWriter.BeginScope();
-
-            // Members
-            if (InitMembers.Count > 0)
-            {
-                foreach (var member in InitMembers)
+                // Members
+                writer.Members(InitMembers, member =>
                 {
                     if (member.IsCollection)
                     {
-                        indentWriter.WriteLine($"private List<{member.TypeName}> {member.ValueMemberName};");
+                        if (member.CollectionType.IsDictionary())
+                        {
+                            writer.Member($"Dictionary<{member.CollectionType.TypeArguments[0].ToDisplayString()}, {member.CollectionType.TypeArguments[1].ToDisplayString()}>", member.ValueMemberName);
+                        }
+                        else
+                        {
+                            writer.Member($"List<{member.TypeName}>", member.ValueMemberName);
+                        }
                     }
                     else
                     {
-                        indentWriter.WriteLine($"private {member.TypeName} {member.ValueMemberName};");
+                        writer.Member(member.TypeName, member.ValueMemberName);
                     }
-                }
+                });
 
-                indentWriter.WriteEmptyLine();
-            }
+                // Constructor
+                writer.Constructor(ClassName);
+                writer.Init(ClassName);
 
-            // Constructor
-            indentWriter.WriteLine($"private {ClassName}()");
-            indentWriter.BeginScope();
-            indentWriter.EndScope(); // end constructor
-
-            // Init()
-            indentWriter.WriteEmptyLine();
-            indentWriter.WriteLine($"public static {ClassName} Init()");
-            indentWriter.BeginScope();
-            indentWriter.WriteLine($"return new {ClassName}();");
-            indentWriter.EndScope(); // end Init()
-
-            // WithMembers()
-            foreach (var member in InitMembers)
-            {
-                if (member.IsCollection)
+                // WithMembers()
+                writer.ForeachWithSeparator(InitMembers, member =>
                 {
-                    indentWriter.WriteEmptyLine();
-                    indentWriter.WriteLine($"public {ClassName} With{member.Name}(IEnumerable<{member.TypeName}> values)");
-                    indentWriter.BeginScope();
-                    indentWriter.WriteLine($"{member.ValueMemberName} = new List<{member.TypeName}>(values);");
-                    indentWriter.WriteLine($"return this;");
-                    indentWriter.EndScope();
+                    member.IsCollection.If(
+                        () => member.CollectionType.IsDictionary().If(
+                            () => writer.WithDictionary(ClassName, member.Name, member.CollectionType.TypeArguments[0].ToDisplayString(), member.CollectionType.TypeArguments[1].ToDisplayString(), member.ValueMemberName),
+                            () => writer.WithCollection(ClassName, member.Name, member.TypeName, member.ValueMemberName)),
+                        () => writer.With(ClassName, member.Name, member.TypeName, member.ValueMemberName)
+                    );
+                });
 
-                    indentWriter.WriteEmptyLine();
-                    indentWriter.WriteLine($"public {ClassName} AddTo{member.Name}({member.TypeName} value)");
-                    indentWriter.BeginScope();
-                    indentWriter.WriteLine($"if ({member.ValueMemberName} == null)");
-                    indentWriter.BeginScope();
-                    indentWriter.WriteLine($"{member.ValueMemberName} = new List<{member.TypeName}>();");
-                    indentWriter.EndScope();
-                    indentWriter.WriteEmptyLine();
-                    indentWriter.WriteLine($"{member.ValueMemberName}.Add(value);");
-                    indentWriter.WriteEmptyLine();
-                    indentWriter.WriteLine($"return this;");
-                    indentWriter.EndScope();
-                }
-                else
-                {
-                    indentWriter.WriteEmptyLine();
-                    indentWriter.WriteLine($"public {ClassName} With{member.Name}({member.TypeName} value)");
-                    indentWriter.BeginScope();
-                    indentWriter.WriteLine($"{member.ValueMemberName} = value;");
-                    indentWriter.WriteLine($"return this;");
-                    indentWriter.EndScope();
-                }
-            }
+                // Build()
+                var constructorMembers = InitMembers.Where(m => m.CtorIndex.HasValue).ToArray();
+                var membersNeedingAdding = InitMembers.Where(m => m.CtorIndex == null && m.IsCollection && !m.HasSetter).ToArray();
+                var assignableMembers = InitMembers.Where(m => m.CtorIndex == null && (!m.IsCollection || m.HasSetter)).ToArray();
 
-            // Build()
-            indentWriter.WriteEmptyLine();
-            indentWriter.WriteLine($"public {TargetClassName} Build()");
-            indentWriter.BeginScope();
-
-            var constructorMembers = InitMembers.Where(m => m.CtorIndex.HasValue).ToArray();
-            var membersNeedingAdding = InitMembers.Where(m => m.CtorIndex == null && m.IsCollection && !m.HasSetter).ToArray();
-            var assignableMembers = InitMembers.Where(m => m.CtorIndex == null && (!m.IsCollection || m.HasSetter)).ToArray();
-
-            if (InitMembers.Count > 0)
-            {
-                bool needsVariable = membersNeedingAdding.Length > 0;
-
-                if (needsVariable)
-                {
-                    indentWriter.Write("var ret = ");
-                }
-                else
-                {
-                    indentWriter.Write("return ");
-                }
-
-                indentWriter.Write($"new {TargetClassName}(");
-
-                for (int i = 0; i < constructorMembers.Length; i++)
-                {
-                    var member = constructorMembers[i];
-                    var isLast = i == constructorMembers.Length - 1;
-
-                    // TODO: Should convert to list/set/dictionary here or expect constructo to always accept IEnumerable?
-                    indentWriter.Write($"{member.ValueMemberName}{(member.IsArray ? ".ToArray()" : "")}{(isLast ? "" : ",")}");
-                }
-
-                indentWriter.Write(")");
-
-                if (assignableMembers.Length == 0)
-                {
-                    indentWriter.WriteLine(";");
-                }
-                else
-                {
-                    indentWriter.WriteLine();
-                }
-
-                // Members that can be assigned with init accessors
-                if (assignableMembers.Length > 0)
-                {
-                    indentWriter.BeginScope();
-                    for (int i = 0; i < assignableMembers.Length; i++)
+                writer.Build(TargetClassName,
+                    constructorParameterInitialization: constructorMembers.Length == 0 ? null :
+                    () =>
                     {
-                        var member = assignableMembers[i];
-                        var isLast = i == assignableMembers.Length - 1;
+                        for (int i = 0; i < constructorMembers.Length; i++)
+                        {
+                            var member = constructorMembers[i];
+                            var isLast = i == constructorMembers.Length - 1;
 
-                        indentWriter.WriteLine($"{member.Name} = {member.ValueMemberName}{(member.IsArray ? ".ToArray()" : "")}{(isLast ? "" : ",")}");
-                    }
-                    indentWriter.EndScope(";");
-                }
-
-                // Collection members that need adding
-                if (membersNeedingAdding.Length > 0)
-                {
-                    for (int i = 0; i < membersNeedingAdding.Length; i++)
+                        // TODO: Should convert to list/set/dictionary here or expect constructo to always accept IEnumerable?
+                        writer.Write($"{member.ValueMemberName}{(member.IsArray ? ".ToArray()" : "")}{(isLast ? "" : ",")}");
+                        }
+                    },
+                    memberInitialization: assignableMembers.Length == 0 ? null :
+                    () =>
                     {
-                        var member = membersNeedingAdding[i];
-                        indentWriter.WriteLine($"foreach (var element in {member.ValueMemberName})");
-                        indentWriter.BeginScope();
-                        indentWriter.WriteLine($"ret.{member.Name}.Add(element);");
-                        indentWriter.EndScope();
-                    }
+                        for (int i = 0; i < assignableMembers.Length; i++)
+                        {
+                            var member = assignableMembers[i];
+                            var isLast = i == assignableMembers.Length - 1;
 
-                    indentWriter.WriteLine($"return ret;");
-                }
+                            if (member.CollectionType.IsDictionary())
+                            {
+                                writer.WriteLine($"{member.Name} = {member.ValueMemberName}{(isLast ? "" : ",")}");
+                            }
+                            else if (member.CollectionType.IsHashSet())
+                            {
+                                writer.WriteLine($"{member.Name} = {member.ValueMemberName}.ToHashSet(){(isLast ? "" : ",")}");
+                            }
+                            else if (member.CollectionType.IsObjectModelCollection())
+                            {
+                                writer.WriteLine($"{member.Name} = new Collection<{member.TypeName}>({member.ValueMemberName}){(isLast ? "" : ",")}");
+                            }
+                            else
+                            {
+                                writer.WriteLine($"{member.Name} = {member.ValueMemberName}{(member.IsArray ? ".ToArray()" : "")}{(isLast ? "" : ",")}");
+                            }
+                        }
+                    },
+                    postMemberInitialization: membersNeedingAdding.Length == 0 ? null :
+                    () =>
+                    {
+                        foreach (var member in membersNeedingAdding)
+                        {
+                            writer.WriteLine($"foreach (var element in {member.ValueMemberName})");
+                            writer.BeginScope();
+                            writer.WriteLine($"ret.{member.Name}.Add(element);");
+                            writer.EndScope();
+                        }
+                    });
             }
-            else
-            {
-                indentWriter.WriteLine($"return new {TargetClassName}();");
-            }
 
-            indentWriter.EndScope(); // end Build()
-            indentWriter.EndScope(); // end class
-            indentWriter.EndScope(); // end namespace
-
-            return writer.ToString();
+            return stringWriter.ToString();
         }
     }
 
@@ -199,13 +130,24 @@ internal class BuilderGenerator
         var namespaces = InitMembers
             .Select(im => im.TypeNamespace);
 
+        namespaces = namespaces.Concat(InitMembers
+            .Where(im => im.IsCollection && im.CollectionType.IsDictionary())
+            .SelectMany(im => im.CollectionType.TypeArguments)
+            .Select(ta => ta.ContainingNamespace.ToString()));
+
         var hasCollections = InitMembers.Any(im => im.IsCollection);
         if (hasCollections)
         {
             namespaces = namespaces.Concat(new[] { "System.Collections.Generic" });
         }
 
-        var hasArrays = InitMembers.Any(im => im.IsArray);
+        var hasObjectModelCollections = InitMembers.Any(im => im.CollectionType.IsObjectModelCollection());
+        if (hasObjectModelCollections)
+        {
+            namespaces = namespaces.Concat(new[] { "System.Collections.ObjectModel" });
+        }
+
+        var hasArrays = InitMembers.Any(im => im.IsArray || (im.CollectionType?.IsHashSet() ?? false));
         if (hasArrays)
         {
             namespaces = namespaces.Concat(new[] { "System.Linq" });

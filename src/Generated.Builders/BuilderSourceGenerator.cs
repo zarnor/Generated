@@ -39,7 +39,8 @@ internal class BuilderSourceGenerator : ISourceGenerator
             var builder = new BuilderGenerator()
             {
                 NewLine = "\n",
-                Namespace = symbol.ContainingNamespace.ToString(),
+                Namespace = symbol.ContainingNamespace.IsGlobalNamespace ?
+                    null : symbol.ContainingNamespace.ToString(),
                 ClassName = symbol.Name,
                 TargetClassName = implementedType.Name,
                 IsPublic = true
@@ -91,6 +92,7 @@ internal class BuilderSourceGenerator : ISourceGenerator
                         TypeNamespace = elementNamespace,
                         TypeName = elementName,
                         IsCollection = true,
+                        CollectionType = member.Type as INamedTypeSymbol,
                         IsArray = member.Type.Kind == SymbolKind.ArrayType,
                         HasSetter = !member.IsReadOnly
                     });

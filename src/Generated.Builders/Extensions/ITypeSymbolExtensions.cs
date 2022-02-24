@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace Generated.Builders;
@@ -38,7 +39,7 @@ internal static class ITypeSymbolExtensions
         {
             if (namedTypeSymbol.IsGenericType)
             {
-                foreach (var iface in namedTypeSymbol.Interfaces)
+                foreach (var iface in namedTypeSymbol.Interfaces.Concat(new[] { namedTypeSymbol }))
                 {
                     var name = iface.OriginalDefinition.ToString();
 
@@ -70,5 +71,47 @@ internal static class ITypeSymbolExtensions
         elementNamespace = null;
         elementName = null;
         return false;
+    }
+    public static bool IsHashSet(this ITypeSymbol symbol)
+    {
+        if (symbol == null)
+        {
+            return false;
+        }
+
+        return symbol.AllInterfaces
+            .Append(symbol)
+            .OfType<INamedTypeSymbol>()
+            .Any(iface => iface.Arity == 1 && iface.ConstructedFrom.ToString() == "System.Collections.Generic.ISet<T>");
+    }
+
+    public static bool IsObjectModelCollection(this ITypeSymbol symbol)
+    {
+        if (symbol == null)
+        {
+            return false;
+        }
+
+        if (symbol is INamedTypeSymbol nts)
+        {
+            if (nts.Arity == 1 && nts.ConstructedFrom.ToString() == "System.Collections.ObjectModel.Collection<T>")
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    public static bool IsDictionary(this ITypeSymbol symbol)
+    {
+        if (symbol == null)
+        {
+            return false;
+        }
+
+        return symbol.AllInterfaces
+            .Append(symbol)
+            .OfType<INamedTypeSymbol>()
+            .Any(iface => iface.Arity == 2 && iface.ConstructedFrom.ToString() == "System.Collections.Generic.IDictionary<TKey, TValue>");
     }
 }
