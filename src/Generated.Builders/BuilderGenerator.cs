@@ -67,7 +67,8 @@ internal class BuilderGenerator
                 // Build()
                 var constructorMembers = InitMembers.Where(m => m.CtorIndex.HasValue).ToArray();
                 var membersNeedingAdding = InitMembers.Where(m => m.CtorIndex == null && m.IsCollection && !m.HasSetter).ToArray();
-                var assignableMembers = InitMembers.Where(m => m.CtorIndex == null && (!m.IsCollection || m.HasSetter)).ToArray();
+                var assignableMembers = InitMembers.Where(m => m.CtorIndex == null && (!m.IsCollection || m.HasSetter) && !m.SkipDefaultValue).ToArray();
+                var membersNeedingPostInitialization = InitMembers.Where(m => m.CtorIndex == null && m.SkipDefaultValue).ToArray();
 
                 writer.Build(TargetClassName,
                     constructorParameterInitialization: constructorMembers.Length == 0 ? null :
@@ -108,14 +109,27 @@ internal class BuilderGenerator
                             }
                         }
                     },
-                    postMemberInitialization: membersNeedingAdding.Length == 0 ? null :
+                    postMemberInitialization: (membersNeedingAdding.Length + membersNeedingPostInitialization.Length) == 0 ? null :
                     () =>
                     {
                         foreach (var member in membersNeedingAdding)
                         {
+                            writer.WriteSeparatorLine();
+                            writer.WriteLine($"if ({member.ValueMemberName} != default)");
+                            writer.BeginScope();
                             writer.WriteLine($"foreach (var element in {member.ValueMemberName})");
                             writer.BeginScope();
                             writer.WriteLine($"ret.{member.Name}.Add(element);");
+                            writer.EndScope();
+                            writer.EndScope();
+                        }
+
+                        foreach (var member in membersNeedingPostInitialization)
+                        {
+                            writer.WriteSeparatorLine();
+                            writer.WriteLine($"if ({member.ValueMemberName} != default)");
+                            writer.BeginScope();
+                            writer.WriteLine($"ret.{member.Name} = {member.ValueMemberName};");
                             writer.EndScope();
                         }
                     });

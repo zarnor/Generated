@@ -191,6 +191,7 @@ class CodeIndentedTextWriter : IndentedTextWriter
         if (needsVariable)
         {
             postMemberInitialization();
+            WriteSeparatorLine();
             WriteLine("return ret;");
         }
 

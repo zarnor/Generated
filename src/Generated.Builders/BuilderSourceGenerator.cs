@@ -1,6 +1,9 @@
+using System;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Generated.Builders;
@@ -80,6 +83,10 @@ internal class BuilderSourceGenerator : ISourceGenerator
 
                 var ctorMember = builder.InitMembers.FirstOrDefault(im => im.Name == member.Name);
 
+                var walker = new PropertyHasDefaultValueSyntaxWalker(member.Name);
+                walker.Visit(classToAugment.Parent);
+                bool hasDefaultValue = walker.HasDefaultValue;
+
                 if (ctorMember != null)
                 {
                     // Skip properties that have already been added (as constructor parameters)
@@ -104,7 +111,8 @@ internal class BuilderSourceGenerator : ISourceGenerator
                         IsCollection = true,
                         CollectionType = member.Type as INamedTypeSymbol,
                         IsArray = member.Type.Kind == SymbolKind.ArrayType,
-                        HasSetter = !member.IsReadOnly
+                        HasSetter = !member.IsReadOnly,
+                        SkipDefaultValue = hasDefaultValue
                     });
                 }
                 else
@@ -114,6 +122,7 @@ internal class BuilderSourceGenerator : ISourceGenerator
                         Name = member.Name,
                         TypeNamespace = member.Type.ContainingNamespace.ToString(),
                         TypeName = member.Type.ToSimplifiedString(),
+                        SkipDefaultValue = hasDefaultValue
                     });
                 }
             }
@@ -128,4 +137,33 @@ internal class BuilderSourceGenerator : ISourceGenerator
         // Add the attribute code because the user should not need to reference the Generator in output assembly.
         context.AddSource("FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode());
     }
+}
+
+class PropertyHasDefaultValueSyntaxWalker : CSharpSyntaxWalker
+{
+    private readonly string _propertyName;
+
+    public PropertyHasDefaultValueSyntaxWalker(string propertyName)
+    {
+        _propertyName = propertyName;
+    }
+
+    public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+    {
+        if (HasDefaultValue)
+        {
+            return;
+        }
+
+        if (node.Identifier.ValueText == _propertyName)
+        {
+            var equals = node.ChildNodes().OfType<EqualsValueClauseSyntax>().FirstOrDefault();
+            HasDefaultValue = equals != null;
+            return;
+        }
+
+        base.VisitPropertyDeclaration(node);
+    }
+
+    public bool HasDefaultValue { get; set; }
 }

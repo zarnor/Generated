@@ -12,6 +12,7 @@ internal class InitMember
     public bool IsArray { get; set; }
     public int? CtorIndex { get; set; }
     public INamedTypeSymbol CollectionType { get; internal set; }
+    public bool SkipDefaultValue { get; internal set; }
 
     internal string ValueMemberName => "_" + Name.Substring(0, 1).ToLower() + Name.Substring(1);
 }

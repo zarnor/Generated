@@ -21,7 +21,8 @@ internal class BuilderSyntaxReceiver : ISyntaxContextReceiver
         {
             var flexBuilderAttribute = typeDeclarationSyntax.AttributeLists
                 .SelectMany(al => al.ChildNodes().OfType<AttributeSyntax>())
-                .Where(a => a.Name.ToString() == "FlexibleBuilder")
+                .Where(a => a.Name.ToString() == "FlexibleBuilder" ||
+                            a.Name.ToString() == "Generated.Builders.FlexibleBuilder")
                 .FirstOrDefault();
 
             if (flexBuilderAttribute == null)

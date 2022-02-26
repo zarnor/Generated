@@ -9,7 +9,7 @@
   
   <PropertyGroup>
     <PackageId>Generated.Builders</PackageId>
-    <Version>0.1.5</Version>
+    <Version>0.1.8</Version>
     <Authors>Jarno Rostedt</Authors>
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
