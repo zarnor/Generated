@@ -484,7 +484,6 @@ namespace TestProject.Models
         }.RunAsync();
     }
 
-
     [Fact]
     public async Task Uses_Constructor_Args_Only_When_Setter_Defined_Also()
     {
@@ -545,6 +544,89 @@ namespace TestProject.Models
             {
                 LastName = _lastName
             };
+        }
+    }
+}
+";
+
+        await new VerifyCS.Test
+        {
+            TestState =
+            {
+                Sources = { code },
+                GeneratedSources =
+                {
+                    (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
+                    (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                },
+            },
+        }.RunAsync();
+    }
+
+    [Fact]
+    public async Task Uses_Constructor_Args_For_Array()
+    {
+        var code = @"using System;
+using System.Collections.Generic;
+using System.Linq;
+using Generated.Builders;
+
+namespace TestProject.Models;
+
+public class Customer
+{
+    public Customer(IEnumerable<string> names)
+    {
+        Names = names.ToArray();
+    }
+
+    public string[] Names { get; }
+}
+
+[FlexibleBuilder(typeof(Customer))]
+public partial class CustomerBuilder
+{
+}
+";
+        var expected = @"using System;
+using System.Collections.Generic;
+
+namespace TestProject.Models
+{
+    public partial class CustomerBuilder
+    {
+        private List<string> _names;
+
+        private CustomerBuilder()
+        {
+        }
+
+        public static CustomerBuilder Init()
+        {
+            return new CustomerBuilder();
+        }
+
+        public CustomerBuilder WithNames(IEnumerable<string> values)
+        {
+            _names = new List<string>(values);
+            return this;
+        }
+
+        public CustomerBuilder AddToNames(string value)
+        {
+            if (_names == null)
+            {
+                _names = new List<string>();
+            }
+
+            _names.Add(value);
+
+            return this;
+        }
+
+        public Customer Build()
+        {
+            return new Customer(_names);
         }
     }
 }
@@ -640,6 +722,170 @@ namespace TestProject.Models
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
                     (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                },
+            },
+        }.RunAsync();
+    }
+
+    [Fact]
+    public async Task Adds_Namespace_For_Member_From_Different_Namespace()
+    {
+        var code = @"using System;
+using System.Collections.Generic;
+using Generated.Builders;
+
+namespace TestProject.DataModels
+{
+    public class ProductData { }
+}
+
+namespace TestProject.Models
+{
+    using TestProject.DataModels;
+
+    public class Product
+    {
+        public ProductData Data { get; set; }
+    }
+
+    [FlexibleBuilder(typeof(Product))]
+    public partial class ProductBuilder
+    {
+    }
+}
+";
+        var expected = @"using TestProject.DataModels;
+
+namespace TestProject.Models
+{
+    public partial class ProductBuilder
+    {
+        private ProductData _data;
+
+        private ProductBuilder()
+        {
+        }
+
+        public static ProductBuilder Init()
+        {
+            return new ProductBuilder();
+        }
+
+        public ProductBuilder WithData(ProductData value)
+        {
+            _data = value;
+            return this;
+        }
+
+        public Product Build()
+        {
+            return new Product()
+            {
+                Data = _data
+            };
+        }
+    }
+}
+";
+
+        await new VerifyCS.Test
+        {
+            TestState =
+            {
+                Sources = { code },
+                GeneratedSources =
+                {
+                    (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
+                    (typeof(BuilderSourceGenerator), "ProductBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                },
+            },
+        }.RunAsync();
+    }
+
+
+    [Fact]
+    public async Task Adds_Namespace_For_Element_From_Different_Namespace()
+    {
+        var code = @"using System;
+using System.Collections.Generic;
+using Generated.Builders;
+
+namespace TestProject.DataModels
+{
+    public class ProductData { }
+}
+
+namespace TestProject.Models
+{
+    using TestProject.DataModels;
+
+    public class Product
+    {
+        public List<ProductData> Datas { get; set; }
+    }
+
+    [FlexibleBuilder(typeof(Product))]
+    public partial class ProductBuilder
+    {
+    }
+}
+";
+        var expected = @"using System.Collections.Generic;
+using TestProject.DataModels;
+
+namespace TestProject.Models
+{
+    public partial class ProductBuilder
+    {
+        private List<ProductData> _datas;
+
+        private ProductBuilder()
+        {
+        }
+
+        public static ProductBuilder Init()
+        {
+            return new ProductBuilder();
+        }
+
+        public ProductBuilder WithDatas(IEnumerable<ProductData> values)
+        {
+            _datas = new List<ProductData>(values);
+            return this;
+        }
+
+        public ProductBuilder AddToDatas(ProductData value)
+        {
+            if (_datas == null)
+            {
+                _datas = new List<ProductData>();
+            }
+
+            _datas.Add(value);
+
+            return this;
+        }
+
+        public Product Build()
+        {
+            return new Product()
+            {
+                Datas = _datas
+            };
+        }
+    }
+}
+";
+
+        await new VerifyCS.Test
+        {
+            TestState =
+            {
+                Sources = { code },
+                GeneratedSources =
+                {
+                    (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
+                    (typeof(BuilderSourceGenerator), "ProductBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();

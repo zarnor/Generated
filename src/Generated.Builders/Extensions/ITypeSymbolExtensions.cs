@@ -39,7 +39,7 @@ internal static class ITypeSymbolExtensions
         {
             if (namedTypeSymbol.IsGenericType)
             {
-                foreach (var iface in namedTypeSymbol.Interfaces.Concat(new[] { namedTypeSymbol }))
+                foreach (var iface in namedTypeSymbol.Interfaces.Append(namedTypeSymbol))
                 {
                     var name = iface.OriginalDefinition.ToString();
 
@@ -47,7 +47,8 @@ internal static class ITypeSymbolExtensions
                     {
                         if (name == "System.Collections.Generic.IList<T>" ||
                             name == "System.Collections.Generic.ICollection<T>" ||
-                            name == "System.Collections.Generic.ISet<T>")
+                            name == "System.Collections.Generic.ISet<T>" ||
+                            name == "System.Collections.Generic.IEnumerable<T>")
                         {
                             if (iface.TypeArguments.Length == 1)
                             {

@@ -78,9 +78,19 @@ internal class BuilderSourceGenerator : ISourceGenerator
                     continue;
                 }
 
-                if (builder.InitMembers.Any(im => im.Name == member.Name))
+                var ctorMember = builder.InitMembers.FirstOrDefault(im => im.Name == member.Name);
+
+                if (ctorMember != null)
                 {
                     // Skip properties that have already been added (as constructor parameters)
+
+                    if (isCollection)
+                    {
+                        ctorMember.TypeNamespace = elementNamespace;
+                        ctorMember.TypeName = elementName;
+                        ctorMember.CollectionType = member.Type as INamedTypeSymbol;
+                    }
+
                     continue;
                 }
 
@@ -102,7 +112,7 @@ internal class BuilderSourceGenerator : ISourceGenerator
                     builder.InitMembers.Add(new InitMember()
                     {
                         Name = member.Name,
-                        TypeNamespace = member.Type.ContainingNamespace.Name,
+                        TypeNamespace = member.Type.ContainingNamespace.ToString(),
                         TypeName = member.Type.ToSimplifiedString(),
                     });
                 }
