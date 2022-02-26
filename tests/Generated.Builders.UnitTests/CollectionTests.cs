@@ -96,7 +96,7 @@ public partial class DtoBuilder
                 GeneratedSources =
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
-                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(BuilderSourceGenerator), "DtoBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();
@@ -171,7 +171,7 @@ public partial class DtoBuilder
                 GeneratedSources =
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
-                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(BuilderSourceGenerator), "DtoBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();

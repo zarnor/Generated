@@ -109,7 +109,7 @@ internal class BuilderSourceGenerator : ISourceGenerator
             }
 
             var source = builder.Build();
-            context.AddSource("Generated.Builders.cs", SourceText.From(source, Encoding.UTF8, SourceHashAlgorithm.Sha256));
+            context.AddSource($"{symbol.Name}.g.cs", SourceText.From(source, Encoding.UTF8, SourceHashAlgorithm.Sha256));
         }
     }
 

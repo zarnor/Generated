@@ -79,7 +79,7 @@ namespace TestProject.Models
                 GeneratedSources =
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
-                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();
@@ -161,7 +161,7 @@ namespace TestProject.Models
                 GeneratedSources =
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
-                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();
@@ -237,7 +237,7 @@ namespace TestProject.Models
                 GeneratedSources =
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
-                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();
@@ -317,7 +317,7 @@ namespace TestProject.Models
                 GeneratedSources =
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
-                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();
@@ -399,7 +399,7 @@ namespace TestProject.Models
                 GeneratedSources =
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
-                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();
@@ -478,7 +478,7 @@ namespace TestProject.Models
                 GeneratedSources =
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
-                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();
@@ -558,7 +558,7 @@ namespace TestProject.Models
                 GeneratedSources =
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
-                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();
@@ -639,7 +639,7 @@ namespace TestProject.Models
                 GeneratedSources =
                 {
                     (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
-                    (typeof(BuilderSourceGenerator), "Generated.Builders.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                    (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
         }.RunAsync();
