@@ -27,6 +27,7 @@ internal static class ITypeSymbolExtensions
             "Decimal" => "decimal",
             "Double" => "double",
             "Float" => "float",
+            "Single" => "float",
             "String" => "string",
             "Object" => "object",
             _ => symbol.Name

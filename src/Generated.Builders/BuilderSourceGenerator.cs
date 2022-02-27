@@ -71,7 +71,7 @@ internal class BuilderSourceGenerator : ISourceGenerator
                 }
             }
 
-            foreach (var member in implementedType.GetMembers().OfType<IPropertySymbol>())
+            foreach (var member in implementedType.GetAllMembers().OfType<IPropertySymbol>())
             {
                 bool isCollection = member.Type.IsCollection(out string elementNamespace, out string elementName);
 

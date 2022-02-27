@@ -1056,4 +1056,78 @@ namespace TestProject.Models
             },
         }.RunAsync();
     }
+
+    [Fact]
+    public async Task Includes_Properties_From_Inherited_Class()
+    {
+        var code = @"using System;
+using Generated.Builders;
+
+namespace TestProject.Models;
+
+public abstract class NamedEntity
+{
+    public string Name { get; set; }
+}
+
+public class CustomerBase : NamedEntity
+{
+}
+
+public class Customer : CustomerBase
+{
+}
+
+[FlexibleBuilder(typeof(Customer))]
+public partial class CustomerBuilder
+{
+}
+";
+        var expected = @"using System;
+
+namespace TestProject.Models
+{
+    public partial class CustomerBuilder
+    {
+        private string _name;
+
+        private CustomerBuilder()
+        {
+        }
+
+        public static CustomerBuilder Init()
+        {
+            return new CustomerBuilder();
+        }
+
+        public CustomerBuilder WithName(string value)
+        {
+            _name = value;
+            return this;
+        }
+
+        public Customer Build()
+        {
+            return new Customer()
+            {
+                Name = _name
+            };
+        }
+    }
+}
+";
+
+        await new VerifyCS.Test
+        {
+            TestState =
+            {
+                Sources = { code },
+                GeneratedSources =
+                {
+                    (typeof(BuilderSourceGenerator), "FlexibleBuilderAttribute.g.cs", FlexibleBuilderAttribute.GetSourceCode()),
+                    (typeof(BuilderSourceGenerator), "CustomerBuilder.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
+                },
+            },
+        }.RunAsync();
+    }
 }
