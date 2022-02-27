@@ -28,11 +28,11 @@ internal class BuilderSourceGenerator : ISourceGenerator
         {
             var model = context.Compilation.GetSemanticModel(classToAugment.SyntaxTree);
             var symbol = model.GetDeclaredSymbol(classToAugment, context.CancellationToken);
-            var attr = symbol.GetAttributes().Where(attr => attr.AttributeClass.Name == "FlexibleBuilder").Single();
 
             var attribute = classToAugment.AttributeLists
                 .SelectMany(list => list.Attributes)
-                .Where(a => a.Name.ToString() == "FlexibleBuilder")
+                .Where(a => a.Name.ToString() == "FlexibleBuilder" ||
+                            a.Name.ToString() == "Generated.Builders.FlexibleBuilder")
                 .SingleOrDefault();
 
             var typeArg = attribute.ArgumentList.Arguments[0];
