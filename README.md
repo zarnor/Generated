@@ -67,6 +67,12 @@ public partial class MyScene : Node2D
 {
     [GetNode("MyLabel")]
     private Label _myLabel;
+
+    // Optional
+    private void Ready()
+    {
+        // My code
+    }
 }
 
 ```
@@ -79,6 +85,9 @@ public partial class MyScene
     public override void _Ready()
     {
         _myLabel = GetNode<Label>("MyLabel");
+
+        // Optional call to Ready() method.
+        Ready();
     }
 }
 ```

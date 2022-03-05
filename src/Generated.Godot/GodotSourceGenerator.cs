@@ -60,6 +60,13 @@ internal class GodotSourceGenerator : ISourceGenerator
                         writer.WriteLine($"{member.Name} = GetNode<{member.Type}>(\"{member.Path}\");");
                     }
 
+                    bool hasReadyFunction = classSymbol.GetMembers("Ready").OfType<IMethodSymbol>().Any(m => !m.Parameters.Any());
+                    if (hasReadyFunction)
+                    {
+                        writer.WriteSeparatorLine();
+                        writer.WriteLine("Ready();");
+                    }
+
                     writer.EndScope();
                 }
 
