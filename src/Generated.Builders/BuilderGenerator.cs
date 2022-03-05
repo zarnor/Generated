@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,8 +20,8 @@ internal class BuilderGenerator
 
         var importedNamespaces = GetImportedNamespaces();
 
-        using (var stringWriter = new StringWriter() { NewLine = NewLine })
-        using (var writer = new CodeIndentedTextWriter(stringWriter) { NewLine = NewLine })
+        using (var stringWriter = new StringWriter())
+        using (var writer = new CodeIndentedTextWriter(stringWriter) { NewLine = Environment.NewLine })
         {
             // Usings
             writer.Usings(importedNamespaces);

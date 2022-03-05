@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,8 +30,8 @@ public class CollectionTests
 
     private async Task VerifyList(string import, string listType, string? expectedImport, string initializerCode)
     {
-        var codeUsings = string.Join("\n", (new[] { "Generated.Builders", import }).Where(x => x != null).OrderBy(x => x).Select(x => $"using {x};"));
-        var expectedUsings = string.Join("\n", (new[] { "System", "System.Collections.Generic", expectedImport }).Where(x => x != null).OrderBy(x => x).Select(x => $"using {x};"));
+        var codeUsings = string.Join(Environment.NewLine, (new[] { "Generated.Builders", import }).Where(x => x != null).OrderBy(x => x).Select(x => $"using {x};"));
+        var expectedUsings = string.Join(Environment.NewLine, (new[] { "System", "System.Collections.Generic", expectedImport }).Where(x => x != null).OrderBy(x => x).Select(x => $"using {x};"));
 
         var code = @"using System;
 " + codeUsings + @"
@@ -104,8 +105,8 @@ public partial class DtoBuilder
 
     private async Task VerifyDictionary(string import, string listType, string? expectedImport, string initializerCode)
     {
-        var codeUsings = string.Join("\n", (new[] { "Generated.Builders", import }).Where(x => x != null).OrderBy(x => x).Select(x => $"using {x};"));
-        var expectedUsings = string.Join("\n", (new[] { "System", "System.Collections.Generic", expectedImport }).Where(x => x != null).OrderBy(x => x).Select(x => $"using {x};"));
+        var codeUsings = string.Join(Environment.NewLine, (new[] { "Generated.Builders", import }).Where(x => x != null).OrderBy(x => x).Select(x => $"using {x};"));
+        var expectedUsings = string.Join(Environment.NewLine, (new[] { "System", "System.Collections.Generic", expectedImport }).Where(x => x != null).OrderBy(x => x).Select(x => $"using {x};"));
 
         var code = @"using System;
 " + codeUsings + @"
