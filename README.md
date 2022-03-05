@@ -50,3 +50,35 @@ var customer = CustomerBuilder.Init()
         .Build())
     .Build();
 ```
+
+## Generated.Godot
+
+Adds _Ready() method that gets all members with [GetNode] -attribute.
+
+### Features
+
+- Adds a _Ready() method that calls GetNode<T>() for all members with [GetNode] -attribute.
+
+```c#
+using System;
+using Godot;
+
+public partial class MyScene : Node2D
+{
+    [GetNode("MyLabel")]
+    private Label _myLabel;
+}
+
+```
+
+Generates:
+
+```c#
+public partial class MyScene
+{
+    public override void _Ready()
+    {
+        _myLabel = GetNode<Label>("MyLabel");
+    }
+}
+```

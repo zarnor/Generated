@@ -17,7 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Generated.Builders.UnitTest
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{9F268AA1-2623-41D3-97E1-B416B6F96232}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApi", "samples\SampleApi\SampleApi.csproj", "{A93007ED-C75F-4B82-ACD3-C87E00E0580D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleApi", "samples\SampleApi\SampleApi.csproj", "{A93007ED-C75F-4B82-ACD3-C87E00E0580D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Generated.Godot", "src\Generated.Godot\Generated.Godot.csproj", "{530FF148-3EF1-4A53-8B38-CE597E36AC33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generated.Godot.UnitTests", "tests\Generated.Godot.UnitTests\Generated.Godot.UnitTests.csproj", "{C6B90212-E428-48FF-B928-22AB7DAF0F96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +41,14 @@ Global
 		{A93007ED-C75F-4B82-ACD3-C87E00E0580D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A93007ED-C75F-4B82-ACD3-C87E00E0580D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A93007ED-C75F-4B82-ACD3-C87E00E0580D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{530FF148-3EF1-4A53-8B38-CE597E36AC33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{530FF148-3EF1-4A53-8B38-CE597E36AC33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{530FF148-3EF1-4A53-8B38-CE597E36AC33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{530FF148-3EF1-4A53-8B38-CE597E36AC33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6B90212-E428-48FF-B928-22AB7DAF0F96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6B90212-E428-48FF-B928-22AB7DAF0F96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6B90212-E428-48FF-B928-22AB7DAF0F96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6B90212-E428-48FF-B928-22AB7DAF0F96}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
