@@ -53,11 +53,12 @@ var customer = CustomerBuilder.Init()
 
 ## Generated.Godot
 
-Adds _Ready() method that gets all members with [GetNode] -attribute.
+Adds _EnterTree() method that gets all members with [GetNode] -attribute.
 
 ### Features
 
-- Adds a _Ready() method that calls GetNode<T>() for all members with [GetNode] -attribute.
+- Adds a _EnterTree() method that calls GetNode<T>() for all members with [GetNode] -attribute.
+- Calls EnterTree method if it is defined in the class.
 
 ```c#
 using System;
@@ -69,12 +70,11 @@ public partial class MyScene : Node2D
     private Label _myLabel;
 
     // Optional
-    private void Ready()
+    private void EnterTree()
     {
         // My code
     }
 }
-
 ```
 
 Generates:
@@ -82,12 +82,12 @@ Generates:
 ```c#
 public partial class MyScene
 {
-    public override void _Ready()
+    public override void _EnterTree()
     {
         _myLabel = GetNode<Label>("MyLabel");
 
-        // Optional call to Ready() method.
-        Ready();
+        // Optional call to EnterTree() method.
+        EnterTree();
     }
 }
 ```

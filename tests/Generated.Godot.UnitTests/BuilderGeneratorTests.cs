@@ -19,7 +19,7 @@ using Generated.Godot;
 public class Label {}
 public class Node2D
 {
-    public virtual void _Ready() {}
+    public virtual void _EnterTree() {}
     public T GetNode<T>(string path)
     {
         return default(T);
@@ -34,7 +34,7 @@ public partial class MyScene : Node2D
 ";
         var expected = @"public partial class MyScene
 {
-    public override void _Ready()
+    public override void _EnterTree()
     {
         _myLabel = GetNode<Label>(""MyLabel"");
     }
@@ -56,7 +56,7 @@ public partial class MyScene : Node2D
     }
 
     [Fact]
-    public async Task Calls_Ready_Function_When_Defined()
+    public async Task Calls_EnterTree_Function_When_Defined()
     {
         var code = @"using System;
 using Generated.Godot;
@@ -64,7 +64,7 @@ using Generated.Godot;
 public class Label {}
 public class Node2D
 {
-    public virtual void _Ready() {}
+    public virtual void _EnterTree() {}
     public T GetNode<T>(string path)
     {
         return default(T);
@@ -76,18 +76,18 @@ public partial class MyScene : Node2D
     [GetNode(""MyLabel"")]
     private Label _myLabel;
 
-    private void Ready()
+    private void EnterTree()
     {
     }
 }
 ";
         var expected = @"public partial class MyScene
 {
-    public override void _Ready()
+    public override void _EnterTree()
     {
         _myLabel = GetNode<Label>(""MyLabel"");
 
-        Ready();
+        EnterTree();
     }
 }
 ";
@@ -107,7 +107,7 @@ public partial class MyScene : Node2D
     }
 
     [Fact]
-    public async Task Reports_When_Conflicting_Ready_Function_Defined()
+    public async Task Reports_When_Conflicting_EnterTree_Function_Defined()
     {
         var code = @"using System;
 using Generated.Godot;
@@ -115,7 +115,7 @@ using Generated.Godot;
 public class Label {}
 public class Node2D
 {
-    public virtual void _Ready() {}
+    public virtual void _EnterTree() {}
     public T GetNode<T>(string path)
     {
         return default(T);
@@ -127,7 +127,7 @@ public partial class MyScene : Node2D
     [GetNode(""MyLabel"")]
     private Label _myLabel;
 
-    private void {|GG1:_Ready|}()
+    private void {|GG1:_EnterTree|}()
     {
     }
 }

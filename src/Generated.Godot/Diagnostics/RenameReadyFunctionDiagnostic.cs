@@ -8,6 +8,6 @@ internal static class RenameReadyFunctionDiagnostic
         => Diagnostic.Create(new DiagnosticDescriptor(Id, Title, Message, "Usage", DiagnosticSeverity.Error, true, null, null), location);
 
     public const string Id = "GG1";
-    public const string Message = "The \"_Ready\" function must be renamed to \"Ready\".";
-    public const string Title = "Duplicate _Ready method definition.";
+    public const string Message = "The \"_EnterTree\" function must be renamed to \"EnterTree\".";
+    public const string Title = "Duplicate _EnterTree method definition.";
 }

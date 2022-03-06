@@ -43,7 +43,7 @@ internal class GodotSourceGenerator : ISourceGenerator
                 using (writer.Namespace(classNamespace))
                 using (writer.Class(classSymbol.Name, classSymbol.DeclaredAccessibility == Accessibility.Public))
                 {
-                    writer.WriteLine("public override void _Ready()");
+                    writer.WriteLine("public override void _EnterTree()");
                     writer.BeginScope();
 
                     var membersWithGetNodeAttributes = classSymbol.GetMembers()
@@ -60,20 +60,20 @@ internal class GodotSourceGenerator : ISourceGenerator
                         writer.WriteLine($"{member.Name} = GetNode<{member.Type}>(\"{member.Path}\");");
                     }
 
-                    var conflictingReadyFunction = classSymbol.GetMembers("_Ready").OfType<IMethodSymbol>().FirstOrDefault(m => !m.Parameters.Any());
-                    if (conflictingReadyFunction != null)
+                    var conflictingEnterTreeFunction = classSymbol.GetMembers("_EnterTree").OfType<IMethodSymbol>().FirstOrDefault(m => !m.Parameters.Any());
+                    if (conflictingEnterTreeFunction != null)
                     {
-                        var node = conflictingReadyFunction.DeclaringSyntaxReferences.First().GetSyntax();
+                        var node = conflictingEnterTreeFunction.DeclaringSyntaxReferences.First().GetSyntax();
                         var token = node.ChildTokens().First(t => t.IsKind(SyntaxKind.IdentifierToken));
                         context.ReportDiagnostic(RenameReadyFunctionDiagnostic.Create(token.GetLocation()));
                         continue;
                     }
 
-                    bool hasReadyFunction = classSymbol.GetMembers("Ready").OfType<IMethodSymbol>().Any(m => !m.Parameters.Any());
-                    if (hasReadyFunction)
+                    bool hasEnterTreeFunction = classSymbol.GetMembers("EnterTree").OfType<IMethodSymbol>().Any(m => !m.Parameters.Any());
+                    if (hasEnterTreeFunction)
                     {
                         writer.WriteSeparatorLine();
-                        writer.WriteLine("Ready();");
+                        writer.WriteLine("EnterTree();");
                     }
 
                     writer.EndScope();
