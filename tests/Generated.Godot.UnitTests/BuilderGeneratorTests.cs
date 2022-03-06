@@ -105,4 +105,43 @@ public partial class MyScene : Node2D
             },
         }.RunAsync();
     }
+
+    [Fact]
+    public async Task Reports_When_Conflicting_Ready_Function_Defined()
+    {
+        var code = @"using System;
+using Generated.Godot;
+
+public class Label {}
+public class Node2D
+{
+    public virtual void _Ready() {}
+    public T GetNode<T>(string path)
+    {
+        return default(T);
+    }
+}
+
+public partial class MyScene : Node2D
+{
+    [GetNode(""MyLabel"")]
+    private Label _myLabel;
+
+    private void {|GG1:_Ready|}()
+    {
+    }
+}
+";
+        await new VerifyCS.Test
+        {
+            TestState =
+            {
+                Sources = { code },
+                GeneratedSources =
+                {
+                    (typeof(GodotSourceGenerator), "GetPathAttribute.g.cs", GetNodeAttribute.GetSourceCode()),
+                }
+            },
+        }.RunAsync();
+    }
 }

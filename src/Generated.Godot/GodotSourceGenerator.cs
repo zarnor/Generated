@@ -60,6 +60,15 @@ internal class GodotSourceGenerator : ISourceGenerator
                         writer.WriteLine($"{member.Name} = GetNode<{member.Type}>(\"{member.Path}\");");
                     }
 
+                    var conflictingReadyFunction = classSymbol.GetMembers("_Ready").OfType<IMethodSymbol>().FirstOrDefault(m => !m.Parameters.Any());
+                    if (conflictingReadyFunction != null)
+                    {
+                        var node = conflictingReadyFunction.DeclaringSyntaxReferences.First().GetSyntax();
+                        var token = node.ChildTokens().First(t => t.IsKind(SyntaxKind.IdentifierToken));
+                        context.ReportDiagnostic(RenameReadyFunctionDiagnostic.Create(token.GetLocation()));
+                        continue;
+                    }
+
                     bool hasReadyFunction = classSymbol.GetMembers("Ready").OfType<IMethodSymbol>().Any(m => !m.Parameters.Any());
                     if (hasReadyFunction)
                     {
