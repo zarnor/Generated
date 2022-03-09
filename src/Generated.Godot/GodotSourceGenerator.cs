@@ -45,6 +45,8 @@ internal class GodotSourceGenerator : ISourceGenerator
                 {
                     writer.WriteLine("public override void _EnterTree()");
                     writer.BeginScope();
+                    writer.WriteLine("base._EnterTree();");
+                    writer.WriteSeparatorLine();
 
                     var membersWithGetNodeAttributes = classSymbol.GetMembers()
                         .OfType<IFieldSymbol>()

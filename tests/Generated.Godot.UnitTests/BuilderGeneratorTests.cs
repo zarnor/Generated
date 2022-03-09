@@ -36,6 +36,8 @@ public partial class MyScene : Node2D
 {
     public override void _EnterTree()
     {
+        base._EnterTree();
+
         _myLabel = GetNode<Label>(""MyLabel"");
     }
 }
@@ -85,6 +87,8 @@ public partial class MyScene : Node2D
 {
     public override void _EnterTree()
     {
+        base._EnterTree();
+
         _myLabel = GetNode<Label>(""MyLabel"");
 
         EnterTree();

@@ -69,11 +69,8 @@ public partial class MyScene : Node2D
     [GetNode("MyLabel")]
     private Label _myLabel;
 
-    // Optional
-    private void EnterTree()
-    {
-        // My code
-    }
+    [GetNode("MyPanel/MyButton")]
+    private Button _myButton;
 }
 ```
 
@@ -84,10 +81,10 @@ public partial class MyScene
 {
     public override void _EnterTree()
     {
+        base._EnterTree();
+        
         _myLabel = GetNode<Label>("MyLabel");
-
-        // Optional call to EnterTree() method.
-        EnterTree();
+        _myButton = GetNode<Button>("MyPanel/MyButton");
     }
 }
 ```
