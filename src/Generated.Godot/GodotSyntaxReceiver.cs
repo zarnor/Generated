@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -24,9 +25,7 @@ internal class GodotSyntaxReceiver : ISyntaxContextReceiver
 
         var classToAugment = memberDeclarationSyntax.AttributeLists
             .SelectMany(al => al.ChildNodes().OfType<AttributeSyntax>())
-            .Where(a => a.Name.ToString() == "GetNode" ||
-                        a.Name.ToString() == "Generated.Godot.GetNode")
-            .FirstOrDefault()
+            .FirstOrDefault(a => GetNodeAttribute.SyntaxNames.Contains(a.Name.ToString()))
             ?.FirstAncestorOrSelf<TypeDeclarationSyntax>();
 
         if (classToAugment != null)

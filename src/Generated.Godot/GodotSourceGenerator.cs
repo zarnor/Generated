@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Generated.Godot.Extensions;
+using Godot;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -17,7 +18,7 @@ internal class GodotSourceGenerator : ISourceGenerator
         // Registers the attribute source to be part of the compilation.
         // It is required since the source generator assembly won't be a dependency in the final assembly.
         // Also without this the attribute type details won't be available later.
-        context.RegisterForPostInitialization((i) => i.AddSource("GetPathAttribute.g.cs", GetNodeAttribute.GetSourceCode()));
+        context.RegisterForPostInitialization((i) => i.AddSource("GetNodeAttribute.g.cs", GetNodeAttribute.GetSourceCode()));
 
         // The generator infrastructure will call the syntax receiver to populate it.
         context.RegisterForSyntaxNotifications(() => new GodotSyntaxReceiver());
@@ -29,7 +30,7 @@ internal class GodotSourceGenerator : ISourceGenerator
 
         // Find the attribute symbol to compare with.
         // Also seems that attribute constructor parameters are not resolved without this.
-        var attributeSymbol = context.Compilation.GetTypeByMetadataName("Generated.Godot.GetNodeAttribute")!;
+        var attributeSymbol = context.Compilation.GetTypeByMetadataName(GetNodeAttribute.FullName)!;
 
         foreach (var classToAugment in syntaxReceiver.ClassesToAugment)
         {

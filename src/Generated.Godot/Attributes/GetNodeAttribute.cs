@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Generated.Godot;
+namespace Godot;
 
 /// <summary>
 /// Get node instance in the OnReady() handler.
@@ -17,11 +17,21 @@ public class GetNodeAttribute : Attribute
 
     public string Path { get; set; }
 
+    internal static string FullName { get; } = "Godot.GetNodeAttribute";
+
+    internal static string[] SyntaxNames { get; } = new string[]
+    {
+        "GetNode",
+        "GetNodeAttribute",
+        "Godot.GetNode",
+        "Godot.GetNodeAttribute"
+    };
+
     public static SourceText GetSourceCode()
     {
         return SourceText.From(@"using System;
 
-namespace Generated.Godot
+namespace Godot
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
     internal class GetNodeAttribute : Attribute

@@ -1,5 +1,6 @@
 using System.Text;
 using System.Threading.Tasks;
+using Godot;
 using Microsoft.CodeAnalysis.Text;
 using Xunit;
 
@@ -14,7 +15,7 @@ public class BuilderGeneratorTests
     public async Task Creates_Ready_Function()
     {
         var code = @"using System;
-using Generated.Godot;
+using Godot;
 
 public class Label {}
 public class Node2D
@@ -50,7 +51,7 @@ public partial class MyScene : Node2D
                 Sources = { code },
                 GeneratedSources =
                 {
-                    (typeof(GodotSourceGenerator), "GetPathAttribute.g.cs", GetNodeAttribute.GetSourceCode()),
+                    (typeof(GodotSourceGenerator), "GetNodeAttribute.g.cs", GetNodeAttribute.GetSourceCode()),
                     (typeof(GodotSourceGenerator), "MyScene.generated.godot.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
@@ -61,7 +62,7 @@ public partial class MyScene : Node2D
     public async Task Calls_EnterTree_Function_When_Defined()
     {
         var code = @"using System;
-using Generated.Godot;
+using Godot;
 
 public class Label {}
 public class Node2D
@@ -103,7 +104,7 @@ public partial class MyScene : Node2D
                 Sources = { code },
                 GeneratedSources =
                 {
-                    (typeof(GodotSourceGenerator), "GetPathAttribute.g.cs", GetNodeAttribute.GetSourceCode()),
+                    (typeof(GodotSourceGenerator), "GetNodeAttribute.g.cs", GetNodeAttribute.GetSourceCode()),
                     (typeof(GodotSourceGenerator), "MyScene.generated.godot.g.cs", SourceText.From(expected, Encoding.UTF8, SourceHashAlgorithm.Sha256)),
                 },
             },
@@ -114,7 +115,7 @@ public partial class MyScene : Node2D
     public async Task Reports_When_Conflicting_EnterTree_Function_Defined()
     {
         var code = @"using System;
-using Generated.Godot;
+using Godot;
 
 public class Label {}
 public class Node2D
@@ -143,7 +144,7 @@ public partial class MyScene : Node2D
                 Sources = { code },
                 GeneratedSources =
                 {
-                    (typeof(GodotSourceGenerator), "GetPathAttribute.g.cs", GetNodeAttribute.GetSourceCode()),
+                    (typeof(GodotSourceGenerator), "GetNodeAttribute.g.cs", GetNodeAttribute.GetSourceCode()),
                 }
             },
         }.RunAsync();
