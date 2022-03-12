@@ -21,17 +21,18 @@ public class GetNodeAttribute : Attribute
     {
         return SourceText.From(@"using System;
 
-namespace Generated.Godot;
-
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
-internal class GetNodeAttribute : Attribute
+namespace Generated.Godot
 {
-    public GetNodeAttribute(string path)
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false)]
+    internal class GetNodeAttribute : Attribute
     {
-        Path = path ?? throw new ArgumentNullException(nameof(path));
-    }
+        public GetNodeAttribute(string path)
+        {
+            Path = path ?? throw new ArgumentNullException(nameof(path));
+        }
 
-    public string Path { get; set; }
+        public string Path { get; set; }
+    }
 }
 ", Encoding.UTF8, SourceHashAlgorithm.Sha256);
     }
